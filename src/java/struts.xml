@@ -3,8 +3,13 @@
 "http://struts.apache.org/dtds/struts-2.0.dtd">
 
 <struts>
-    <!-- Configuration for the default package. -->
-    <package name="default" extends="struts-default">
-        
-    </package>
+  <!-- Configuration for the default package. -->
+  <package name="config" extends="struts-default" namespace="/">
+    <action name="" class="action.admin.CrawlProductAction">
+      <result name="success">index.html</result>
+    </action>
+    <action name="test" class="action.admin.CrawlProductAction">
+      <result name="success">index.html</result>
+    </action>
+  </package>
 </struts>
