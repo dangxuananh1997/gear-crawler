@@ -16,7 +16,7 @@ public class DBUtilities implements Serializable {
     public static Connection makeConnection() throws NamingException, SQLException {
         Context context = new InitialContext();
         Context tomcatContext = (Context) context.lookup("java:comp/env");
-        DataSource ds = (DataSource) tomcatContext.lookup("ENewsDS");
+        DataSource ds = (DataSource) tomcatContext.lookup("GearCrawlerDS");
         Connection con = ds.getConnection();
         return con;
     }

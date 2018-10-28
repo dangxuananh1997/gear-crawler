@@ -12,7 +12,6 @@ public class CrawlProductAction {
     }
     
     public String execute() throws Exception {
-        System.out.println("wtf");
         HangchinhhieuCrawler hccCrawler = new HangchinhhieuCrawler();
         hccCrawler.crawlLaptop();
         return "success";

@@ -21,7 +21,7 @@ public class ProductDAO {
         try {
             con = DBUtilities.makeConnection();
             if (con != null) {
-                String sql = "INSERT INTO Article (ProductTypeId, HashCode, Name, Image, Price, ProductLink) VALUES (?,?,?,?,?,?)";
+                String sql = "INSERT INTO Product (ProductTypeId, HashCode, Name, Image, Price, ProductLink) VALUES (?,?,?,?,?,?)";
                 stm = con.prepareStatement(sql);
                 stm.setInt(1, product.getProductType().getValue());
                 stm.setInt(2, product.hashCode());

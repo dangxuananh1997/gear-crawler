@@ -1,5 +1,6 @@
 package crawler;
 
+import dao.ProductDAO;
 import dto.KeyboardDTO;
 import dto.LaptopDTO;
 import dto.MouseDTO;
@@ -36,8 +37,23 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     private final String mousePath = "/collections/chuot";
     private final String keyboardPath = "/collections/ban-phim";
     private final String headsetPath = "/collections/tai-nghe";
+    private boolean isPause = false;
+    private ProductType pauseProductType;
+    private int pausePosition;
     
     public HangchinhhieuCrawler() {
+    }
+
+    public boolean isIsPause() {
+        return isPause;
+    }
+
+    public void setIsPause(boolean isPause) {
+        this.isPause = isPause;
+    }
+    
+    public void pauseCrawler() {
+        setIsPause(true);
     }
     
     private String getPaginationDomString(String url) {
@@ -248,11 +264,18 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     
     @Override
     public void crawlLaptop() {
-        List<ProductDTO> productList = getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP);
-        for (ProductDTO product : productList) {
-            String tableDomString = getInfoTableDomString(siteUrl + product.getProductLink());
-            LaptopDTO laptop = parseLaptop(tableDomString, product);
-            System.out.println(laptop);
+        try {
+            ProductDAO productDAO = new ProductDAO();
+            List<ProductDTO> productList = getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP);
+            for (ProductDTO product : productList) {
+                System.out.println(product);
+                productDAO.addProduct(product);
+    //            String tableDomString = getInfoTableDomString(siteUrl + product.getProductLink());
+    //            LaptopDTO laptop = parseLaptop(tableDomString, product);
+    //            System.out.println(laptop);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 

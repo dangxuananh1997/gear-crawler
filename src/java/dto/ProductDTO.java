@@ -55,4 +55,9 @@ public class ProductDTO {
         this.id = id;
     }
 
+    @Override
+    public String toString() {
+        return "ProductDTO{" + "id=" + id + ", productType=" + productType + ", hashCode=" + hashCode + ", name=" + name + ", image=" + image + ", price=" + price + ", productLink=" + productLink + '}';
+    }
+
 }
