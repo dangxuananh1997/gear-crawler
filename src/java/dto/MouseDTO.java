@@ -4,19 +4,25 @@ package dto;
  *
  * @author dangxuananh1997
  */
-public class MouseDTO extends ProductDTO {
+public class MouseDTO {
     
+    private int id;
     private String weight;
     private String maxDPI;
     private String led;
     private String numberOfButton;
+    private ProductDTO product;
 
     public MouseDTO(String weight, String maxDPI, String led, String numberOfButton, ProductDTO product) {
-        super(product.getProductType(), product.getName(), product.getImage(), product.getPrice(), product.getProductLink());
         this.weight = weight;
         this.maxDPI = maxDPI;
         this.led = led;
         this.numberOfButton = numberOfButton;
+        this.product = product;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getWeight() {
@@ -35,9 +41,8 @@ public class MouseDTO extends ProductDTO {
         return numberOfButton;
     }
 
-    @Override
-    public String toString() {
-        return "{" + "weight=" + weight + ", maxDPI=" + maxDPI + ", led=" + led + ", numberOfButton=" + numberOfButton + '}';
+    public ProductDTO getProduct() {
+        return product;
     }
     
 }

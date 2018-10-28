@@ -165,6 +165,8 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
                             Node productImageNode = (Node) xPath.evaluate(".//div[@class=\"image-product\"]/a/img", productNode, XPathConstants.NODE);
                             String productImage = productImageNode.getAttributes().getNamedItem("src").getTextContent().trim();
                             
+                            productLink = siteUrl + productLink;
+                            
                             ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceHangchinhhieu(productPrice), productLink);
                             productArray.add(product);
                             System.out.print("+");
@@ -267,13 +269,7 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
         try {
             ProductDAO productDAO = new ProductDAO();
             List<ProductDTO> productList = getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP);
-            for (ProductDTO product : productList) {
-                System.out.println(product);
-                productDAO.addProduct(product);
-    //            String tableDomString = getInfoTableDomString(siteUrl + product.getProductLink());
-    //            LaptopDTO laptop = parseLaptop(tableDomString, product);
-    //            System.out.println(laptop);
-            }
+            productDAO.addProducts(productList, ProductType.LAPTOP);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -298,7 +294,7 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     public void crawlMouse() {
         List<ProductDTO> productList = getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE);
         for (ProductDTO product : productList) {
-            String tableDomString = getInfoTableDomString(siteUrl + product.getProductLink());
+            String tableDomString = getInfoTableDomString(product.getProductLink());
             MouseDTO mouse = parseMouse(tableDomString, product);
             System.out.println(mouse);
         }
@@ -326,7 +322,7 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     public void crawlKeyboard() {
         List<ProductDTO> productList = getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD);
         for (ProductDTO product : productList) {
-            String tableDomString = getInfoTableDomString(siteUrl + product.getProductLink());
+            String tableDomString = getInfoTableDomString(product.getProductLink());
             KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
             System.out.println(keyboard);
         }

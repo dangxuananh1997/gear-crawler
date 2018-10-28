@@ -25,8 +25,8 @@ public enum ProductType {
         }
     }
 
-    public static ProductType valueOf(int pageType) {
-        return (ProductType) map.get(pageType);
+    public static ProductType valueOf(int productType) {
+        return (ProductType) map.get(productType);
     }
 
     public int getValue() {

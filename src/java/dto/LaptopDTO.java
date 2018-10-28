@@ -4,8 +4,9 @@ package dto;
  *
  * @author dangxuananh1997
  */
-public class LaptopDTO extends ProductDTO {
+public class LaptopDTO {
     
+    private int id;
     private String cpu;
     private String gpu;
     private String ram;
@@ -14,9 +15,9 @@ public class LaptopDTO extends ProductDTO {
     private String ports;
     private String lan;
     private String wireless;
+    private ProductDTO product;
 
     public LaptopDTO(String cpu, String gpu, String ram, String hardDrive, String monitor, String ports, String lan, String wireless, ProductDTO product) {
-        super(product.getProductType(), product.getName(), product.getImage(), product.getPrice(), product.getProductLink());
         this.cpu = cpu;
         this.gpu = gpu;
         this.ram = ram;
@@ -25,6 +26,24 @@ public class LaptopDTO extends ProductDTO {
         this.ports = ports;
         this.lan = lan;
         this.wireless = wireless;
+        this.product = product;
+    }
+
+    public LaptopDTO(int id, String cpu, String gpu, String ram, String hardDrive, String monitor, String ports, String lan, String wireless, ProductDTO product) {
+        this.id = id;
+        this.cpu = cpu;
+        this.gpu = gpu;
+        this.ram = ram;
+        this.hardDrive = hardDrive;
+        this.monitor = monitor;
+        this.ports = ports;
+        this.lan = lan;
+        this.wireless = wireless;
+        this.product = product;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getCpu() {
@@ -59,9 +78,8 @@ public class LaptopDTO extends ProductDTO {
         return wireless;
     }
 
-    @Override
-    public String toString() {
-        return getHashCode() + "\n" + getName() + "\n" + getPrice() + "\n" + getImage() + "\n" + cpu + "\n" + gpu + "\n" + ram + "\n" + hardDrive + "\n" + monitor + "\n" + ports + "\n" + lan + "\n" + wireless + "\n";
+    public ProductDTO getProduct() {
+        return product;
     }
     
 }
