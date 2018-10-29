@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [GearCrawler]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Database [GearCrawler]    Script Date: 29-Oct-18 07:20:10 AM ******/
 CREATE DATABASE [GearCrawler]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -77,7 +77,27 @@ ALTER DATABASE [GearCrawler] SET QUERY_STORE = OFF
 GO
 USE [GearCrawler]
 GO
-/****** Object:  Table [dbo].[Headset]    Script Date: 29-Oct-18 01:00:50 AM ******/
+ALTER DATABASE SCOPED CONFIGURATION SET IDENTITY_CACHE = ON;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET LEGACY_CARDINALITY_ESTIMATION = OFF;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET LEGACY_CARDINALITY_ESTIMATION = PRIMARY;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = 0;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET MAXDOP = PRIMARY;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET PARAMETER_SNIFFING = ON;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET PARAMETER_SNIFFING = PRIMARY;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET QUERY_OPTIMIZER_HOTFIXES = OFF;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET QUERY_OPTIMIZER_HOTFIXES = PRIMARY;
+GO
+USE [GearCrawler]
+GO
+/****** Object:  Table [dbo].[Headset]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -91,7 +111,7 @@ CREATE TABLE [dbo].[Headset](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Keyboard]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[Keyboard]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -112,7 +132,7 @@ CREATE TABLE [dbo].[Keyboard](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Laptop]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[Laptop]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -134,7 +154,7 @@ CREATE TABLE [dbo].[Laptop](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Mouse]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[Mouse]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -152,7 +172,7 @@ CREATE TABLE [dbo].[Mouse](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Order]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[Order]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -167,7 +187,7 @@ CREATE TABLE [dbo].[Order](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[OrderDetails]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[OrderDetails]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -183,7 +203,7 @@ CREATE TABLE [dbo].[OrderDetails](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Product]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[Product]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -202,19 +222,25 @@ CREATE TABLE [dbo].[Product](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ProductType]    Script Date: 29-Oct-18 01:00:50 AM ******/
+/****** Object:  Table [dbo].[ProductType]    Script Date: 29-Oct-18 07:20:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[ProductType](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Id] [int] NOT NULL,
 	[TypeName] [nchar](30) NOT NULL,
  CONSTRAINT [PK_ProductType] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+INSERT [dbo].[ProductType] ([Id], [TypeName]) VALUES (1, N'Laptop                        ')
+GO
+INSERT [dbo].[ProductType] ([Id], [TypeName]) VALUES (2, N'Mouse                         ')
+GO
+INSERT [dbo].[ProductType] ([Id], [TypeName]) VALUES (3, N'Keyboard                      ')
 GO
 ALTER TABLE [dbo].[Headset]  WITH CHECK ADD  CONSTRAINT [FK_Headset_Product] FOREIGN KEY([ProductId])
 REFERENCES [dbo].[Product] ([Id])
