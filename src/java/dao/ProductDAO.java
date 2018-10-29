@@ -57,7 +57,7 @@ public class ProductDAO implements Serializable {
         return productList;
     }
     
-    public boolean addProduct(ProductDTO product) throws SQLException, NamingException {
+    public ProductDTO addProduct(ProductDTO product) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -65,7 +65,7 @@ public class ProductDAO implements Serializable {
             con = DBUtilities.makeConnection();
             if (con != null) {
                 String sql = "INSERT INTO Product (ProductTypeId, HashCode, Name, Image, Price, ProductLink) VALUES (?,?,?,?,?,?)";
-                stm = con.prepareStatement(sql);
+                stm = con.prepareStatement(sql, stm.RETURN_GENERATED_KEYS);
                 stm.setInt(1, product.getProductType().getValue());
                 stm.setString(2, product.getHashCode());
                 stm.setString(3, product.getName());
@@ -74,9 +74,14 @@ public class ProductDAO implements Serializable {
                 stm.setString(6, product.getProductLink());
                 boolean success = stm.executeUpdate() > 0;
                 
-                return success;
+                rs = stm.getGeneratedKeys();
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    product.setId(id);
+                    return product;
+                }
             }
-            return false;
+            return null;
         } finally {
             if (rs != null) {
                 rs.close();

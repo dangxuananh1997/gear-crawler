@@ -1,5 +1,9 @@
 package crawler;
 
+import dao.KeyboardDAO;
+import dao.LaptopDAO;
+import dao.MouseDAO;
+import dao.ProductDAO;
 import dto.KeyboardDTO;
 import dto.LaptopDTO;
 import dto.MouseDTO;
@@ -7,12 +11,14 @@ import dto.ProductDTO;
 import dto.ProductType;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
@@ -29,7 +35,7 @@ import utility.XMLUtilities;
  *
  * @author dangxuananh1997
  */
-public class XgearCrawler implements CrawlerInterface {
+public class XgearCrawler {
     
     private final String siteUrl = "https://xgear.vn";
     private final String[] laptopPath = {
@@ -42,9 +48,70 @@ public class XgearCrawler implements CrawlerInterface {
     private final String keyboardPath = "/danh-muc/keyboard";
     private final String headsetPath = "/danh-muc/headset-tai-nghe";
     
+    ProductDAO productDAO = new ProductDAO();
+    LaptopDAO laptopDAO = new LaptopDAO();
+    MouseDAO mouseDAO = new MouseDAO();
+    KeyboardDAO keyboardDAO = new KeyboardDAO();
+            
+    private List<ProductDTO> productList = new LinkedList<>();
+    private boolean isPause = false;
+    private int pausePosition = 0;
+    
     public XgearCrawler() {
     }
 
+    public void crawl() throws SQLException, NamingException {
+        System.out.println("XGEAR - CRAWLING");
+        
+        this.isPause = false;
+        
+        // get Laptops, Mouses, Keyboards
+        for (String path : laptopPath) {
+            this.productList.addAll(getAllDraftProducts(siteUrl + path, ProductType.LAPTOP));
+        }
+        this.productList.addAll(getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE));
+        this.productList.addAll(getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD));
+        
+        List<ProductDTO> existingProductList = productDAO.getAllProduct();
+        List<String> existingHashCode = new LinkedList<>();
+        for (ProductDTO product : existingProductList) {
+            existingHashCode.add(product.getHashCode());
+        }
+        
+        for (int i = pausePosition; i < productList.size(); i++) {
+            if (isPause) {
+                System.out.println("XGEAR - PAUSED");
+                break;
+            } else {
+                this.pausePosition++;
+                ProductDTO product = productList.get(i);
+                if (!existingHashCode.contains(product.getHashCode())) {
+                    System.out.print(".");
+                    String tableDomString = getInfoTableDomString(product.getProductLink());
+                    product = productDAO.addProduct(product);
+                    switch (product.getProductType()) {
+                        case LAPTOP:
+                            LaptopDTO laptop = parseLaptop(tableDomString, product);
+                            laptopDAO.addLaptop(laptop);
+                            break;
+                        case MOUSE:
+                            MouseDTO mouse = parseMouse(tableDomString, product);
+                            mouseDAO.addMouse(mouse);
+                            break;
+                        case KEYBOARD:
+                            KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
+                            keyboardDAO.addKeyboard(keyboard);
+                            break;
+                        default:
+                            break;
+                    }      
+                }
+            }
+        }
+        
+        System.out.println("\nXGEAR - FINISHED");
+    }
+    
     private String getPaginationDomString(String url) {
         try {
             BufferedReader reader = XMLUtilities.getBufferedReaderFromURL(url);
@@ -77,7 +144,6 @@ public class XgearCrawler implements CrawlerInterface {
     }
     
     private int getLastPageNumber(String url) {
-        System.out.print("get last page");
         int pageNum = 1;
         try {
             String domString = getPaginationDomString(url);
@@ -92,7 +158,6 @@ public class XgearCrawler implements CrawlerInterface {
         } catch (NumberFormatException | XPathExpressionException ex) {
             Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(" - done: " + pageNum);
         return pageNum;
     }
     
@@ -136,7 +201,6 @@ public class XgearCrawler implements CrawlerInterface {
     }
     
     private List<ProductDTO> getAllDraftProducts(String url, ProductType productType) {
-        System.out.println("get all draft products");
         List<ProductDTO> productArray = new LinkedList<>();
         try {
             int lastPageNumber = getLastPageNumber(url);
@@ -163,7 +227,6 @@ public class XgearCrawler implements CrawlerInterface {
                             
                             ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceXgear(productPrice), productLink);
                             productArray.add(product);
-                            System.out.print("+");
                         }
                     }
                 }
@@ -171,7 +234,6 @@ public class XgearCrawler implements CrawlerInterface {
         } catch (XPathExpressionException | DOMException ex) {
             Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("\nget all draft products - done");
         return productArray;
     }
     
@@ -257,19 +319,6 @@ public class XgearCrawler implements CrawlerInterface {
         }
         return null;
     }
-    
-    @Override
-    public boolean crawlLaptop() {
-        for (String laptopLink : laptopPath) {
-            List<ProductDTO> productList = getAllDraftProducts(siteUrl + laptopLink, ProductType.LAPTOP);
-            for (ProductDTO product : productList) {
-                String tableDomString = getInfoTableDomString(product.getProductLink());
-                LaptopDTO laptop = parseLaptop(tableDomString, product);
-                System.out.println(laptop);
-            }
-        }
-        return true;
-    }
 
     private MouseDTO parseMouse(String tableDomString, ProductDTO product) {
         try {
@@ -286,17 +335,6 @@ public class XgearCrawler implements CrawlerInterface {
         return null;
     }
     
-    @Override
-    public boolean crawlMouse() {
-        List<ProductDTO> productList = getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE);
-        for (ProductDTO product : productList) {
-            String tableDomString = getInfoTableDomString(product.getProductLink());
-            MouseDTO mouse = parseMouse(tableDomString, product);
-            System.out.println(mouse);
-        }
-        return true;
-    }
-
     private KeyboardDTO parseKeyboard(String tableDomString, ProductDTO product) {
         try {
             Map<String, String> table = getInfoTableMap(tableDomString);
@@ -315,20 +353,4 @@ public class XgearCrawler implements CrawlerInterface {
         return null;
     }
 
-    @Override
-    public boolean crawlKeyboard() {
-        List<ProductDTO> productList = getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD);
-        for (ProductDTO product : productList) {
-            String tableDomString = getInfoTableDomString(product.getProductLink());
-            KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
-            System.out.println(keyboard);
-        }
-        return true;
-    }
-
-    @Override
-    public void crawlHeadset() {
-        
-    }
-    
 }

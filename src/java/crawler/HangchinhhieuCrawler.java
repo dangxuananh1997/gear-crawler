@@ -1,5 +1,8 @@
 package crawler;
 
+import dao.KeyboardDAO;
+import dao.LaptopDAO;
+import dao.MouseDAO;
 import dao.ProductDAO;
 import dto.KeyboardDTO;
 import dto.LaptopDTO;
@@ -41,6 +44,9 @@ public class HangchinhhieuCrawler {
     private final String headsetPath = "/collections/tai-nghe";
     
     ProductDAO productDAO = new ProductDAO();
+    LaptopDAO laptopDAO = new LaptopDAO();
+    MouseDAO mouseDAO = new MouseDAO();
+    KeyboardDAO keyboardDAO = new KeyboardDAO();
             
     private List<ProductDTO> productList = new LinkedList<>();
     private boolean isPause = false;
@@ -54,7 +60,7 @@ public class HangchinhhieuCrawler {
     }
     
     public void crawl() throws SQLException, NamingException {
-        System.out.println("crawling");
+        System.out.println("HANGCHINHHIEU - CRAWLING");
         
         this.isPause = false;
         
@@ -71,22 +77,27 @@ public class HangchinhhieuCrawler {
         
         for (int i = pausePosition; i < productList.size(); i++) {
             if (isPause) {
+                System.out.println("\nHANGCHINHHIEU - PAUSED");
                 break;
             } else {
                 this.pausePosition++;
                 ProductDTO product = productList.get(i);
                 if (!existingHashCode.contains(product.getHashCode())) {
+                    System.out.print(".");
                     String tableDomString = getInfoTableDomString(product.getProductLink());
-                    productDAO.addProduct(product);
+                    product = productDAO.addProduct(product);
                     switch (product.getProductType()) {
                         case LAPTOP:
                             LaptopDTO laptop = parseLaptop(tableDomString, product);
+                            laptopDAO.addLaptop(laptop);
                             break;
                         case MOUSE:
                             MouseDTO mouse = parseMouse(tableDomString, product);
+                            mouseDAO.addMouse(mouse);
                             break;
                         case KEYBOARD:
                             KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
+                            keyboardDAO.addKeyboard(keyboard);
                             break;
                         default:
                             break;
@@ -94,6 +105,8 @@ public class HangchinhhieuCrawler {
                 }
             }
         }
+        
+        System.out.println("\nHANGCHINHHIEU - FINISHED");
     }
     
     private String getPaginationDomString(String url) {
@@ -128,7 +141,6 @@ public class HangchinhhieuCrawler {
     }
     
     private int getLastPageNumber(String url) {
-        System.out.print("get last page");
         int pageNum = 1;
         try {
             String domString = getPaginationDomString(url);
@@ -143,7 +155,6 @@ public class HangchinhhieuCrawler {
         } catch (NumberFormatException | XPathExpressionException ex) {
             Logger.getLogger(HangchinhhieuCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(" - done");
         return pageNum;
     }
     
@@ -184,7 +195,6 @@ public class HangchinhhieuCrawler {
     }
     
     private List<ProductDTO> getAllDraftProducts(String url, ProductType productType) {
-        System.out.println("get all draft products");
         List<ProductDTO> productArray = new LinkedList<>();
         try {
             int lastPageNumber = getLastPageNumber(url);
@@ -209,7 +219,6 @@ public class HangchinhhieuCrawler {
                             
                             ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceHangchinhhieu(productPrice), productLink);
                             productArray.add(product);
-                            System.out.print("+");
                         }
                     }
                 }
@@ -217,7 +226,6 @@ public class HangchinhhieuCrawler {
         } catch (XPathExpressionException | DOMException ex) {
             Logger.getLogger(HangchinhhieuCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("\nget all draft products - done");
         return productArray;
     }
     
