@@ -259,7 +259,7 @@ public class XgearCrawler implements CrawlerInterface {
     }
     
     @Override
-    public void crawlLaptop() {
+    public boolean crawlLaptop() {
         for (String laptopLink : laptopPath) {
             List<ProductDTO> productList = getAllDraftProducts(siteUrl + laptopLink, ProductType.LAPTOP);
             for (ProductDTO product : productList) {
@@ -268,6 +268,7 @@ public class XgearCrawler implements CrawlerInterface {
                 System.out.println(laptop);
             }
         }
+        return true;
     }
 
     private MouseDTO parseMouse(String tableDomString, ProductDTO product) {
@@ -286,13 +287,14 @@ public class XgearCrawler implements CrawlerInterface {
     }
     
     @Override
-    public void crawlMouse() {
+    public boolean crawlMouse() {
         List<ProductDTO> productList = getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE);
         for (ProductDTO product : productList) {
             String tableDomString = getInfoTableDomString(product.getProductLink());
             MouseDTO mouse = parseMouse(tableDomString, product);
             System.out.println(mouse);
         }
+        return true;
     }
 
     private KeyboardDTO parseKeyboard(String tableDomString, ProductDTO product) {
@@ -314,13 +316,14 @@ public class XgearCrawler implements CrawlerInterface {
     }
 
     @Override
-    public void crawlKeyboard() {
+    public boolean crawlKeyboard() {
         List<ProductDTO> productList = getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD);
         for (ProductDTO product : productList) {
             String tableDomString = getInfoTableDomString(product.getProductLink());
             KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
             System.out.println(keyboard);
         }
+        return true;
     }
 
     @Override

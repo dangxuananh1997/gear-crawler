@@ -6,11 +6,11 @@ package crawler;
  */
 public interface CrawlerInterface {
     
-    void crawlLaptop();
+    boolean crawlLaptop();
     
-    void crawlMouse();
+    boolean crawlMouse();
     
-    void crawlKeyboard();
+    boolean crawlKeyboard();
     
     void crawlHeadset();
     

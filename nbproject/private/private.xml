@@ -3,8 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Work/dangxuananh1997/gear-crawler/src/java/crawler/HangchinhhieuCrawler.java</file>
-            <file>file:/D:/Work/dangxuananh1997/gear-crawler/src/java/dao/ProductDAO.java</file>
+            <file>file:/D:/Study/FPT/Courses/2018Fall/PRX301/Project/gear-crawler/src/java/dao/LaptopDAO.java</file>
+            <file>file:/D:/Study/FPT/Courses/2018Fall/PRX301/Project/gear-crawler/src/java/crawler/HangchinhhieuCrawler.java</file>
+            <file>file:/D:/Study/FPT/Courses/2018Fall/PRX301/Project/gear-crawler/src/java/dao/ProductDAO.java</file>
+            <file>file:/D:/Study/FPT/Courses/2018Fall/PRX301/Project/gear-crawler/src/java/action/admin/CrawlProductAction.java</file>
         </group>
     </open-files>
 </project-private>
