@@ -24,8 +24,19 @@ public class CrawlProductAction {
     public String execute() throws Exception {
         ServletContext context = ServletActionContext.getServletContext();
         crawlerList = (List<CrawlerInterface>) context.getAttribute("CRAWLERLIST");
-        for (CrawlerInterface crawler : crawlerList) {
-            crawler.crawl();
+        switch (action) {
+            case "Crawl":
+                for (CrawlerInterface crawler : crawlerList) {
+                    crawler.crawl();
+                }
+                break;
+            case "Pause":
+                for (CrawlerInterface crawler : crawlerList) {
+                    crawler.pause();
+                }
+                break;
+            default:
+                break;
         }
         return Action.SUCCESS;
     }

@@ -53,7 +53,7 @@ public class XgearCrawler implements CrawlerInterface {
     KeyboardDAO keyboardDAO = new KeyboardDAO();
             
     private List<ProductDTO> productList = new LinkedList<>();
-    private boolean isPause = false;
+    private boolean isStop = false;
     private int pausePosition = 0;
     
     public XgearCrawler() {
@@ -61,9 +61,9 @@ public class XgearCrawler implements CrawlerInterface {
 
     @Override
     public void crawl() throws SQLException, NamingException {
-        if (!this.isPause) {
+        if (!this.isStop) {
             System.out.println("XGEAR - CRAWLING");
-            this.isPause = false;
+            this.isStop = false;
 
             // get Laptops, Mouses, Keyboards
             for (String path : laptopPath) {
@@ -80,8 +80,8 @@ public class XgearCrawler implements CrawlerInterface {
 
             for (int i = pausePosition; i < productList.size(); i++) {
                 try {
-                    if (isPause) {
-                        System.out.println("XGEAR - PAUSED");
+                    if (isStop) {
+                        System.out.println("\nXGEAR - PAUSED");
                         break;
                     } else {
                         this.pausePosition++;
@@ -111,16 +111,17 @@ public class XgearCrawler implements CrawlerInterface {
                     System.out.println(e);
                 }
             }
-            System.out.println("XGEAR - FINISHED");
-        } else {
-            System.out.println("XGEAR - PAUSED");
+            if (!this.isStop) {
+                System.out.println("XGEAR - FINISHED");
+            }
+            this.isStop = true;
         }
     }
     
     @Override
     public void pause() {
-        if (!this.isPause) {
-            this.isPause = true;
+        if (!this.isStop) {
+            this.isStop = true;
             System.out.println("HANGCHINHHIEU - PAUSED");
         }
     }

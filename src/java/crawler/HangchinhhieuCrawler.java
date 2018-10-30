@@ -48,7 +48,7 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     KeyboardDAO keyboardDAO = new KeyboardDAO();
             
     private List<ProductDTO> productList = new LinkedList<>();
-    private boolean isPause = false;
+    private boolean isStop = false;
     private int pausePosition = 0;
     
     public HangchinhhieuCrawler() {
@@ -56,9 +56,9 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     
     @Override
     public void crawl() throws SQLException, NamingException {
-        if (!this.isPause) {
+        if (!this.isStop) {
             System.out.println("HANGCHINHHIEU - CRAWLING");
-            this.isPause = false;
+            this.isStop = false;
 
             // get Laptops, Mouses, Keyboards
             this.productList.addAll(getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP));
@@ -73,7 +73,7 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
 
             for (int i = pausePosition; i < productList.size(); i++) {
                 try {
-                    if (isPause) {
+                    if (isStop) {
                         System.out.println("HANGCHINHHIEU - PAUSED");
                         break;
                     } else {
@@ -104,16 +104,17 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
                     System.out.println(e);
                 }
             }
-            System.out.println("HANGCHINHHIEU - FINISHED");
-        } else {
-            System.out.println("HANGCHINHHIEU - PAUSED");
+            if (!this.isStop) {
+                System.out.println("HANGCHINHHIEU - FINISHED");
+            }
+            this.isStop = true;
         }
     }
 
     @Override
     public void pause() {
-        if (!this.isPause) {
-            this.isPause = true;
+        if (!this.isStop) {
+            this.isStop = true;
             System.out.println("HANGCHINHHIEU - PAUSED");
         }
     }
