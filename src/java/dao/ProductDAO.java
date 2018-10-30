@@ -95,4 +95,42 @@ public class ProductDAO implements Serializable {
         }
     }
     
+    public List<ProductDTO> getAllProduct(ProductType productType) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<ProductDTO> productList = new LinkedList<>();
+        
+        try {
+            con = DBUtilities.makeConnection();
+            if (con != null) {
+                String sql = "SELECT * FROM Product";
+                stm = con.prepareStatement(sql);
+                rs = stm.executeQuery();
+                
+                while (rs.next()) {
+                    int id = rs.getInt("Id");
+                    String hashCode = rs.getString("HashCode");
+                    String name = rs.getString("Name");
+                    String image = rs.getString("Image");
+                    int price = rs.getInt("Price");
+                    String productLink = rs.getString("ProductLink");
+                    ProductDTO product = new ProductDTO(id, productType, hashCode, name, image, price, productLink);
+                    productList.add(product);
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return productList;
+    }
+    
 }

@@ -5,14 +5,14 @@
 <struts>
   <!-- Configuration for the default package. -->
   <package name="config" extends="struts-default" namespace="/">
-    <action name="" class="action.admin.CrawlProductAction">
-      <result name="success">index.html</result>
+    <action name="">
+      <result>index.html</result>
     </action>
     <action name="crawl" class="action.admin.CrawlProductAction">
       <result name="success">index.html</result>
       <result name="error">error.html</result>
     </action>
-    <action name="viewProduct" class="action.client.ViewProductAction">
+    <action name="getProduct" class="action.client.GetProductAction">
       <result name="success" type="stream">
         <param name="contentType">application/xml</param>
         <param name="inputName">result</param>
