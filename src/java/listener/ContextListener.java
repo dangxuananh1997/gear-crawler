@@ -1,7 +1,10 @@
 package listener;
 
+import crawler.CrawlerInterface;
 import crawler.HangchinhhieuCrawler;
 import crawler.XgearCrawler;
+import java.util.LinkedList;
+import java.util.List;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -11,17 +14,17 @@ import javax.servlet.ServletContextListener;
  */
 public class ContextListener implements ServletContextListener {
 
-    private HangchinhhieuCrawler hccCrawler;
-    private XgearCrawler xgearCrawler;
+    private List<CrawlerInterface> crawlerList = new LinkedList<>();
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("CREATING CRAWLERS!");
-        hccCrawler = new HangchinhhieuCrawler();
-        xgearCrawler = new XgearCrawler();
+        HangchinhhieuCrawler hccCrawler = new HangchinhhieuCrawler();
+        XgearCrawler xgearCrawler = new XgearCrawler();
+        crawlerList.add(hccCrawler);
+        crawlerList.add(xgearCrawler);
         System.out.println("CRAWLERS CREATED!");
-        sce.getServletContext().setAttribute("HCCCRAWLER", hccCrawler);
-        sce.getServletContext().setAttribute("XGEARCRAWLER", xgearCrawler);
+        sce.getServletContext().setAttribute("CRAWLERLIST", crawlerList);
     }
 
     @Override

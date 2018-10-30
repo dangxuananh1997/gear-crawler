@@ -1,17 +1,16 @@
 package crawler;
 
+import java.sql.SQLException;
+import javax.naming.NamingException;
+
 /**
  *
  * @author dangxuananh1997
  */
 public interface CrawlerInterface {
     
-    boolean crawlLaptop();
+    void crawl() throws SQLException, NamingException;
     
-    boolean crawlMouse();
-    
-    boolean crawlKeyboard();
-    
-    void crawlHeadset();
+    void pause();
     
 }

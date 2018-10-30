@@ -35,18 +35,17 @@ import utility.XMLUtilities;
  *
  * @author dangxuananh1997
  */
-public class XgearCrawler {
+public class XgearCrawler implements CrawlerInterface {
     
     private final String siteUrl = "https://xgear.vn";
     private final String[] laptopPath = {
         "/danh-muc/laptop-msi",
-        "/danh-muc/laptop-asus/",
-        "/danh-muc/laptop-dell/",
-        "/danh-muc/laptop-acer/",
+        "/danh-muc/laptop-asus",
+        "/danh-muc/laptop-dell",
+        "/danh-muc/laptop-acer",
     };
     private final String mousePath = "/danh-muc/mouse";
     private final String keyboardPath = "/danh-muc/keyboard";
-    private final String headsetPath = "/danh-muc/headset-tai-nghe";
     
     ProductDAO productDAO = new ProductDAO();
     LaptopDAO laptopDAO = new LaptopDAO();
@@ -60,56 +59,70 @@ public class XgearCrawler {
     public XgearCrawler() {
     }
 
+    @Override
     public void crawl() throws SQLException, NamingException {
-        System.out.println("XGEAR - CRAWLING");
-        
-        this.isPause = false;
-        
-        // get Laptops, Mouses, Keyboards
-        for (String path : laptopPath) {
-            this.productList.addAll(getAllDraftProducts(siteUrl + path, ProductType.LAPTOP));
-        }
-        this.productList.addAll(getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE));
-        this.productList.addAll(getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD));
-        
-        List<ProductDTO> existingProductList = productDAO.getAllProduct();
-        List<String> existingHashCode = new LinkedList<>();
-        for (ProductDTO product : existingProductList) {
-            existingHashCode.add(product.getHashCode());
-        }
-        
-        for (int i = pausePosition; i < productList.size(); i++) {
-            if (isPause) {
-                System.out.println("XGEAR - PAUSED");
-                break;
-            } else {
-                this.pausePosition++;
-                ProductDTO product = productList.get(i);
-                if (!existingHashCode.contains(product.getHashCode())) {
-                    System.out.print(".");
-                    String tableDomString = getInfoTableDomString(product.getProductLink());
-                    product = productDAO.addProduct(product);
-                    switch (product.getProductType()) {
-                        case LAPTOP:
-                            LaptopDTO laptop = parseLaptop(tableDomString, product);
-                            laptopDAO.addLaptop(laptop);
-                            break;
-                        case MOUSE:
-                            MouseDTO mouse = parseMouse(tableDomString, product);
-                            mouseDAO.addMouse(mouse);
-                            break;
-                        case KEYBOARD:
-                            KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
-                            keyboardDAO.addKeyboard(keyboard);
-                            break;
-                        default:
-                            break;
-                    }      
+        if (!this.isPause) {
+            System.out.println("XGEAR - CRAWLING");
+            this.isPause = false;
+
+            // get Laptops, Mouses, Keyboards
+            for (String path : laptopPath) {
+                this.productList.addAll(getAllDraftProducts(siteUrl + path, ProductType.LAPTOP));
+            }
+            this.productList.addAll(getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE));
+            this.productList.addAll(getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD));
+
+            List<ProductDTO> existingProductList = productDAO.getAllProduct();
+            List<String> existingHashCode = new LinkedList<>();
+            for (ProductDTO product : existingProductList) {
+                existingHashCode.add(product.getHashCode());
+            }
+
+            for (int i = pausePosition; i < productList.size(); i++) {
+                try {
+                    if (isPause) {
+                        System.out.println("XGEAR - PAUSED");
+                        break;
+                    } else {
+                        this.pausePosition++;
+                        ProductDTO product = productList.get(i);
+                        if (!existingHashCode.contains(product.getHashCode())) {
+                            String tableDomString = getInfoTableDomString(product.getProductLink());
+                            product = productDAO.addProduct(product);
+                            switch (product.getProductType()) {
+                                case LAPTOP:
+                                    LaptopDTO laptop = parseLaptop(tableDomString, product);
+                                    laptopDAO.addLaptop(laptop);
+                                    break;
+                                case MOUSE:
+                                    MouseDTO mouse = parseMouse(tableDomString, product);
+                                    mouseDAO.addMouse(mouse);
+                                    break;
+                                case KEYBOARD:
+                                    KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
+                                    keyboardDAO.addKeyboard(keyboard);
+                                    break;
+                                default:
+                                    break;
+                            }      
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
             }
+            System.out.println("XGEAR - FINISHED");
+        } else {
+            System.out.println("XGEAR - PAUSED");
         }
-        
-        System.out.println("\nXGEAR - FINISHED");
+    }
+    
+    @Override
+    public void pause() {
+        if (!this.isPause) {
+            this.isPause = true;
+            System.out.println("HANGCHINHHIEU - PAUSED");
+        }
     }
     
     private String getPaginationDomString(String url) {
@@ -238,6 +251,7 @@ public class XgearCrawler {
     }
     
     private String getInfoTableDomString(String url) {
+        System.out.print("XGEAR - GET PRODUCT: " + url);
         try {
             BufferedReader reader = XMLUtilities.getBufferedReaderFromURL(url);
             String line;
@@ -261,8 +275,10 @@ public class XgearCrawler {
                     document += line.trim();
                 }
             }
+            System.out.println(" - DONE");
             return document;
         } catch (IOException ex) {
+            System.out.println(" - ERROR");
             Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "";

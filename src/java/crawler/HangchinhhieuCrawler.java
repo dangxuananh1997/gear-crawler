@@ -35,13 +35,12 @@ import utility.XMLUtilities;
  *
  * @author dangxuananh1997
  */
-public class HangchinhhieuCrawler {
+public class HangchinhhieuCrawler implements CrawlerInterface {
 
     private final String siteUrl = "https://hangchinhhieu.vn";
     private final String laptopPath = "/collections/laptop";
     private final String mousePath = "/collections/chuot";
     private final String keyboardPath = "/collections/ban-phim";
-    private final String headsetPath = "/collections/tai-nghe";
     
     ProductDAO productDAO = new ProductDAO();
     LaptopDAO laptopDAO = new LaptopDAO();
@@ -55,58 +54,68 @@ public class HangchinhhieuCrawler {
     public HangchinhhieuCrawler() {
     }
     
-    public void pauseCrawler() {
-        isPause = true;
-    }
-    
+    @Override
     public void crawl() throws SQLException, NamingException {
-        System.out.println("HANGCHINHHIEU - CRAWLING");
-        
-        this.isPause = false;
-        
-        // get Laptops, Mouses, Keyboards
-        this.productList.addAll(getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP));
-        this.productList.addAll(getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE));
-        this.productList.addAll(getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD));
-        
-        List<ProductDTO> existingProductList = productDAO.getAllProduct();
-        List<String> existingHashCode = new LinkedList<>();
-        for (ProductDTO product : existingProductList) {
-            existingHashCode.add(product.getHashCode());
-        }
-        
-        for (int i = pausePosition; i < productList.size(); i++) {
-            if (isPause) {
-                System.out.println("\nHANGCHINHHIEU - PAUSED");
-                break;
-            } else {
-                this.pausePosition++;
-                ProductDTO product = productList.get(i);
-                if (!existingHashCode.contains(product.getHashCode())) {
-                    System.out.print(".");
-                    String tableDomString = getInfoTableDomString(product.getProductLink());
-                    product = productDAO.addProduct(product);
-                    switch (product.getProductType()) {
-                        case LAPTOP:
-                            LaptopDTO laptop = parseLaptop(tableDomString, product);
-                            laptopDAO.addLaptop(laptop);
-                            break;
-                        case MOUSE:
-                            MouseDTO mouse = parseMouse(tableDomString, product);
-                            mouseDAO.addMouse(mouse);
-                            break;
-                        case KEYBOARD:
-                            KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
-                            keyboardDAO.addKeyboard(keyboard);
-                            break;
-                        default:
-                            break;
-                    }      
+        if (!this.isPause) {
+            System.out.println("HANGCHINHHIEU - CRAWLING");
+            this.isPause = false;
+
+            // get Laptops, Mouses, Keyboards
+            this.productList.addAll(getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP));
+            this.productList.addAll(getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE));
+            this.productList.addAll(getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD));
+
+            List<ProductDTO> existingProductList = productDAO.getAllProduct();
+            List<String> existingHashCode = new LinkedList<>();
+            for (ProductDTO product : existingProductList) {
+                existingHashCode.add(product.getHashCode());
+            }
+
+            for (int i = pausePosition; i < productList.size(); i++) {
+                try {
+                    if (isPause) {
+                        System.out.println("HANGCHINHHIEU - PAUSED");
+                        break;
+                    } else {
+                        this.pausePosition++;
+                        ProductDTO product = productList.get(i);
+                        if (!existingHashCode.contains(product.getHashCode())) {
+                            String tableDomString = getInfoTableDomString(product.getProductLink());
+                            product = productDAO.addProduct(product);
+                            switch (product.getProductType()) {
+                                case LAPTOP:
+                                    LaptopDTO laptop = parseLaptop(tableDomString, product);
+                                    laptopDAO.addLaptop(laptop);
+                                    break;
+                                case MOUSE:
+                                    MouseDTO mouse = parseMouse(tableDomString, product);
+                                    mouseDAO.addMouse(mouse);
+                                    break;
+                                case KEYBOARD:
+                                    KeyboardDTO keyboard = parseKeyboard(tableDomString, product);
+                                    keyboardDAO.addKeyboard(keyboard);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
             }
+            System.out.println("HANGCHINHHIEU - FINISHED");
+        } else {
+            System.out.println("HANGCHINHHIEU - PAUSED");
         }
-        
-        System.out.println("\nHANGCHINHHIEU - FINISHED");
+    }
+
+    @Override
+    public void pause() {
+        if (!this.isPause) {
+            this.isPause = true;
+            System.out.println("HANGCHINHHIEU - PAUSED");
+        }
     }
     
     private String getPaginationDomString(String url) {
@@ -230,6 +239,7 @@ public class HangchinhhieuCrawler {
     }
     
     private String getInfoTableDomString(String url) {
+        System.out.print("HANGCHINHHIEU - GET PRODUCT: " + url);
         try {
             BufferedReader reader = XMLUtilities.getBufferedReaderFromURL(url);
             String line;
@@ -252,11 +262,13 @@ public class HangchinhhieuCrawler {
                     }
                     
                     if (closeTagPos > 0) {
+                        System.out.println(" - DONE");
                         return line.trim();
                     }
                 }
             }
         } catch (IOException ex) {
+            System.out.println(" - ERROR");
             Logger.getLogger(HangchinhhieuCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "";

@@ -1,8 +1,8 @@
 package action.admin;
 
 import com.opensymphony.xwork2.Action;
-import crawler.HangchinhhieuCrawler;
-import crawler.XgearCrawler;
+import crawler.CrawlerInterface;
+import java.util.List;
 import javax.servlet.ServletContext;
 import org.apache.struts2.ServletActionContext;
 
@@ -12,17 +12,21 @@ import org.apache.struts2.ServletActionContext;
  */
 public class CrawlProductAction {
 
+    // Inputs
     private String action;
+    
+    // Local Variables
+    private List<CrawlerInterface> crawlerList;
     
     public CrawlProductAction() {
     }
     
     public String execute() throws Exception {
         ServletContext context = ServletActionContext.getServletContext();
-        HangchinhhieuCrawler hccCrawler = (HangchinhhieuCrawler) context.getAttribute("HCCCRAWLER");
-        XgearCrawler xgCrawler = (XgearCrawler) context.getAttribute("XGEARCRAWLER");
-        hccCrawler.crawl();
-        xgCrawler.crawl();
+        crawlerList = (List<CrawlerInterface>) context.getAttribute("CRAWLERLIST");
+        for (CrawlerInterface crawler : crawlerList) {
+            crawler.crawl();
+        }
         return Action.SUCCESS;
     }
 
