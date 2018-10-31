@@ -19,9 +19,9 @@
     <header>
       <span>Gear Crawler</span>
       <nav>
-        <a class="<s:if test="%{productType.getValue() == 1}">selected</s:if>" href="/GearCrawler/laptop">Laptop</a>
-        <a class="<s:if test="%{productType.getValue() == 2}">selected</s:if>" href="/GearCrawler/mouse">Mouse</a>
-        <a class="<s:if test="%{productType.getValue() == 3}">selected</s:if>" href="/GearCrawler/keyboard">Keyboard</a>
+        <a <s:if test="%{productType.getValue() == 1}">class="selected"</s:if>href="/GearCrawler/laptop">Laptop</a>
+        <a <s:if test="%{productType.getValue() == 2}">class="selected"</s:if> href="/GearCrawler/mouse">Mouse</a>
+        <a <s:if test="%{productType.getValue() == 3}">class="selected"</s:if> href="/GearCrawler/keyboard">Keyboard</a>
       </nav>
     </header>
         
@@ -43,8 +43,8 @@
       <section class="pagination">
         <nav>
           <s:set var="lastPage" value="%{lastPage}" />
-          <s:iterator var="counter" begin="1" end="lastPage">
-            <a><s:property /></a>
+          <s:iterator begin="1" end="lastPage" status="i">
+            <a <s:if test="%{0 == #i.index}">class="selected"</s:if>><s:property /></a>
           </s:iterator>
         </nav>
       </section>

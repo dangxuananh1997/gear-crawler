@@ -179,7 +179,7 @@ section.pagination a {
   transition-duration: 0.3s;
   cursor: pointer;
 }
-section.pagination a:hover {
+section.pagination a:hover, section.pagination a.selected {
   background: #00b4f0;
   color: #000000;
   font-weight: bold;

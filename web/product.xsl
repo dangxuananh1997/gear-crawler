@@ -38,4 +38,6 @@
       </xsl:element>
     </xsl:for-each>
   </xsl:template>
+  <xsl:template match="pageNumber"></xsl:template>
+  <xsl:template match="lastPage"></xsl:template>
 </xsl:stylesheet>
