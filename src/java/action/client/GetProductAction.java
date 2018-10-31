@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import jaxb.Data;
 import jaxb.Products;
 
 /**
@@ -18,10 +19,12 @@ import jaxb.Products;
  */
 public class GetProductAction {
 
+    private final int pageSize = 16;
+    
     // Inputs
     private String searchValue;
     private ProductType productType;
-    private int page;
+    private int pageNumber = 1;
     
     // Outputs
     InputStream result;
@@ -32,25 +35,21 @@ public class GetProductAction {
     public String execute() throws Exception {
         ProductDAO productDAO = new ProductDAO();
         List<ProductDTO> productList = productDAO.getAllProduct(productType);
+        int lastPage = Math.round((float)productList.size() / this.pageSize);
+        
         try {
-            JAXBContext context = JAXBContext.newInstance(Products.class);
+            JAXBContext context = JAXBContext.newInstance(Data.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             StringWriter sw = new StringWriter();
             Products products = new Products();
             products.setProduct(productList);
-            marshaller.marshal(products, sw);
+            Data data = new Data(lastPage, pageNumber, products);
+            marshaller.marshal(data, sw);
             this.result = new ByteArrayInputStream(sw.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             System.out.println(e);
-            this.result = new ByteArrayInputStream(("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<Context path=\"/GearCrawler\">\n" +
-                "  <Resource name=\"GearCrawlerDS\" type=\"javax.sql.DataSource\" auth=\"Container\"\n" +
-                "    driverClassName=\"com.microsoft.sqlserver.jdbc.SQLServerDriver\"\n" +
-                "    url=\"jdbc:sqlserver://localhost:1433;databaseName=GearCrawler\"\n" +
-                "    username=\"sa\" password=\"123\"/>\n" +
-                "</Context>").toString().getBytes("UTF-8"));
-            return Action.SUCCESS;
+            return Action.ERROR;
         }
         return Action.SUCCESS;
     }
@@ -63,12 +62,12 @@ public class GetProductAction {
         this.searchValue = searchValue;
     }
 
-    public int getPage() {
-        return page;
+    public int getPageNumber() {
+        return pageNumber;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
     }
 
     public InputStream getResult() {

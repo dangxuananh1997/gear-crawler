@@ -1,16 +1,67 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Gear Crawler</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="assets/fonts/material-icons/material-icons.css">
+</head>
+<body>
+  
+  <header>
+    <span>Gear Crawler</span>
+    <nav>
+      <a class="selected" href="">Laptop</a>
+      <a href="">Mouse</a>
+      <a href="">Keyboard</a>
+    </nav>
+  </header>
+  
+  <main>
+    <section class="search">
+      <form action="" method="POST">
+        <i class="material-icons">search</i>
+        <input type="text" name="search">
+        <button type="submit">Search</button>
+      </form>
+    </section>
+    
+    <section class="product-list">
+      <a href="">
+        <article class="product">
+          <div class="image-wrapper">
+            <img src="assets/images/laptop.jpg">
+          </div>
+          <div class="product-info">
+            <p>Product Name Product Name Product Name</p>
+            <span>10.000đ</span>
+          </div>
+        </article>
+      </a>
+      <a href="">
+        <article class="product">
+          <div class="image-wrapper">
+            <img src="assets/images/macbook.jpg">
+          </div>
+          <div class="product-info">
+            <p>Product Name Product Name Product Name</p>
+            <span>10.000đ</span>
+          </div>
+        </article>
+      </a>
+      
+    </section>
+
+    <section class="pagination">
+      <nav>
+        <a href="">1</a>
+        <a href="">2</a>
+      </nav>
+    </section>
+  </main>
+  
+  <footer></footer>
+</body>
 </html>

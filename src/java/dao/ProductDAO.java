@@ -104,8 +104,9 @@ public class ProductDAO implements Serializable {
         try {
             con = DBUtilities.makeConnection();
             if (con != null) {
-                String sql = "SELECT * FROM Product";
+                String sql = "SELECT * FROM Product WHERE ProductTypeId = ?";
                 stm = con.prepareStatement(sql);
+                stm.setInt(1, productType.getValue());
                 rs = stm.executeQuery();
                 
                 while (rs.next()) {

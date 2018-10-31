@@ -20,16 +20,22 @@ public class ProductDTO {
     
     @XmlElement(required = true)
     private int id;
+
     @XmlElement(required = true)
     private ProductType productType;
+
     @XmlElement(required = true)
     private String hashCode;
+
     @XmlElement(required = true)
     private String name;
+
     @XmlElement(required = true)
     private String image;
+
     @XmlElement(required = true)
     private int price;
+
     @XmlElement(required = true)
     private String productLink;
 
@@ -63,7 +69,7 @@ public class ProductDTO {
     public void setId(int id) {
         this.id = id;
     }
-
+    
     public ProductType getProductType() {
         return productType;
     }
