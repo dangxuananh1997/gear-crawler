@@ -1,4 +1,5 @@
 let productXSL;
+let lastPage;
 
 getXSL();
 
@@ -21,14 +22,18 @@ function showLoading(isLoading) {
 
 function getData(pageNumber) {
   showLoading(true);
-  
   let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState === 4 && this.status === 200) {
+      let resLastPage = this.responseXML.querySelector('lastPage').innerHTML;
+      if (lastPage !== resLastPage) {
+        lastPage = resLastPage;
+        updatePagination(lastPage);
+      }
       showLoading(false);
       const result = transformXML(this.responseXML);
-      document.getElementById("productList").innerHTML = "";
-      document.getElementById("productList").append(result);
+      document.getElementById('productList').innerHTML = '';
+      document.getElementById('productList').append(result);
     }
   };
   
@@ -63,6 +68,18 @@ function search() {
 function changePage(event) {
   const pageNumber = event.srcElement.dataset.page;
   getData(pageNumber);
-  document.querySelector("section.pagination nav a.selected").classList.remove("selected");
+  document.querySelector('section.pagination nav a.selected').classList.remove('selected');
   event.srcElement.classList.add('selected');
+}
+
+function updatePagination(lastPage) {
+  console.log(lastPage);
+  const pageLinkList = document.querySelector('section.pagination nav');
+  let newPages = '';
+  let i;
+  for (i = 1; i <= lastPage; i++) {
+    newPages += '<a data-page="' + i + '" onclick="changePage(event)">' + i + '</a>';
+  }
+  pageLinkList.innerHTML = newPages;
+  document.querySelector('section.pagination nav a:first-child').classList.add('selected');
 }

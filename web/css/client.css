@@ -169,7 +169,12 @@ section.product-list article.product div.product-info p {
 section.pagination {
   padding: 20px;
 }
-section.pagination a {
+section.pagination nav {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+section.pagination nav a {
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 5px;
@@ -179,8 +184,10 @@ section.pagination a {
   border: 1px solid #00b4f0;
   transition-duration: 0.3s;
   cursor: pointer;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
-section.pagination a:hover, section.pagination a.selected {
+section.pagination nav a:hover, section.pagination a.selected {
   background: #00b4f0;
   color: #000000;
   font-weight: bold;

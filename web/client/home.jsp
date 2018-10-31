@@ -51,7 +51,8 @@
             <a data-page="<s:property value="%{#i.index + 1}"/>"
               class="<s:if test="%{0 == #i.index}">selected</s:if>"
               onclick="changePage(event)">
-              <s:property value="%{#i.index + 1}"/></a>
+              <s:property value="%{#i.index + 1}"/>
+            </a>
           </s:iterator>
         </nav>
       </section>
