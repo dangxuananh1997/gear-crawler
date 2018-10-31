@@ -30,7 +30,7 @@
           <div class="product-info">
             <p><xsl:value-of select="name"/></p>
             <span>
-              <xsl:value-of select="price"/>
+              <xsl:value-of select="format-number(price, '###,###')"/>
               <xsl:text>&#8363;</xsl:text>
             </span>
           </div>

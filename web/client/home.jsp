@@ -12,14 +12,18 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Gear Crawler - ${productType}</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/client.css">
     <link rel="stylesheet" href="assets/fonts/material-icons/material-icons.css">
+    <script>
+      let productType = <s:property value="%{productType.getValue()}"/>;
+    </script>
+    <script src="js/client.js"></script>
   </head>
   <body>
     <header>
       <span>Gear Crawler</span>
       <nav>
-        <a <s:if test="%{productType.getValue() == 1}">class="selected"</s:if>href="/GearCrawler/laptop">Laptop</a>
+        <a <s:if test="%{productType.getValue() == 1}">class="selected"</s:if> href="/GearCrawler/laptop">Laptop</a>
         <a <s:if test="%{productType.getValue() == 2}">class="selected"</s:if> href="/GearCrawler/mouse">Mouse</a>
         <a <s:if test="%{productType.getValue() == 3}">class="selected"</s:if> href="/GearCrawler/keyboard">Keyboard</a>
       </nav>
@@ -27,14 +31,14 @@
         
     <main>
       <section class="search">
-        <form action="" method="POST">
+        <div>
           <i class="material-icons">search</i>
-          <input type="text" name="search">
-          <button type="submit">Search</button>
-        </form>
+          <input type="text" name="search" id="search" onkeyup="search()">
+          <button onclick="getData()">Search</button>
+        </div>
       </section>
       
-      <section class="product-list">
+      <section class="product-list" id="productList">
         <c:import url="../product.xsl" var="xslProduct" />
         <s:set var="xml" value="%{xmlOutput}" />
         <x:transform xml="${xml}" xslt="${xslProduct}" />
@@ -44,7 +48,10 @@
         <nav>
           <s:set var="lastPage" value="%{lastPage}" />
           <s:iterator begin="1" end="lastPage" status="i">
-            <a <s:if test="%{0 == #i.index}">class="selected"</s:if>><s:property /></a>
+            <a data-page="<s:property value="%{#i.index + 1}"/>"
+              class="<s:if test="%{0 == #i.index}">selected</s:if>"
+              onclick="changePage(event)">
+              <s:property value="%{#i.index + 1}"/></a>
           </s:iterator>
         </nav>
       </section>

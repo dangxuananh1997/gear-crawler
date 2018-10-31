@@ -7,6 +7,7 @@ import dto.ProductType;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -33,11 +34,31 @@ public class GetProductAction {
     }
     
     public String execute() throws Exception {
-        ProductDAO productDAO = new ProductDAO();
-        List<ProductDTO> productList = productDAO.getAllProduct(productType);
-        int lastPage = Math.round((float)productList.size() / this.pageSize);
-        
         try {
+            ProductDAO productDAO = new ProductDAO();
+            List<ProductDTO> productList = productDAO.getAllProduct(productType);
+            if (searchValue != null && !searchValue.equals("")) {
+                List<ProductDTO> exceptList = new LinkedList<>();
+                for (ProductDTO product : productList) {
+                    boolean match = product.getName().toLowerCase().contains(searchValue.toLowerCase());
+                    if (!match) {
+                        exceptList.add(product);
+                    }
+                }
+                for (ProductDTO product : exceptList) {
+                    productList.remove(product);
+                }
+            }
+            int lastPage = (int) Math.ceil((float) productList.size() / (float) this.pageSize);
+            System.out.println(lastPage);
+            System.out.println(productList.size());
+            System.out.println(this.pageSize);
+            if (productList.size() > this.pageSize * this.pageNumber) {
+                productList = productList.subList(this.pageSize * (this.pageNumber - 1), this.pageSize * this.pageNumber);
+            } else {
+                productList = productList.subList(this.pageSize * (this.pageNumber - 1), productList.size());
+            }
+            
             JAXBContext context = JAXBContext.newInstance(Data.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");

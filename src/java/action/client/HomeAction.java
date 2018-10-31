@@ -33,7 +33,7 @@ public class HomeAction {
     public String execute() throws Exception {
         ProductDAO productDAO = new ProductDAO();
         List<ProductDTO> productList = productDAO.getAllProduct(productType);
-        this.lastPage = Math.round((float)productList.size() / this.pageSize);
+        this.lastPage = (int) Math.ceil((float) productList.size() / (float) this.pageSize);
         productList = productList.subList(this.pageSize * (this.pageNumber - 1), this.pageSize * this.pageNumber);
         
         try {

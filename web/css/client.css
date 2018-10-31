@@ -68,7 +68,7 @@ section.search {
   height: 60px;
   padding: 20px;
 }
-section.search form {
+section.search div {
   position: relative;
   background: #373a3e;
   height: 100%;
@@ -76,13 +76,13 @@ section.search form {
   border-radius: 4px;
   margin: auto;
 }
-section.search i {
+section.search div i {
   color: #00b4f0;
   font-size: 40px;
   line-height: 60px;
   margin-left: 10px;
 }
-section.search form input {
+section.search div input {
   position: absolute;
   height: 100%;
   width: calc(100% - 60px - 100px);
@@ -96,7 +96,7 @@ section.search form input {
   font-family: Krub;
   font-size: 20px;
 }
-section.search form button {
+section.search div button {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -112,7 +112,7 @@ section.search form button {
   font-size: 18px;
   cursor: pointer;
 }
-section.search form button:hover {
+section.search div button:hover {
   background: #57d5ff;
 }
 section.product-list {
@@ -158,6 +158,7 @@ section.product-list article.product div.image-wrapper img {
 section.product-list article.product div.product-info {
   padding: 10px;
   color: #ffffff;
+  text-align: right;
 }
 section.product-list article.product div.product-info p {
   margin: 0;
