@@ -35,7 +35,7 @@ import utility.XMLUtilities;
  *
  * @author dangxuananh1997
  */
-public class HangchinhhieuCrawler implements CrawlerInterface {
+public class HangchinhhieuCrawler implements CrawlerInterface, Runnable {
 
     private final String siteUrl = "https://hangchinhhieu.vn";
     private final String laptopPath = "/collections/laptop";
@@ -47,23 +47,36 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     MouseDAO mouseDAO = new MouseDAO();
     KeyboardDAO keyboardDAO = new KeyboardDAO();
             
-    private List<ProductDTO> productList = new LinkedList<>();
-    private boolean isStop = false;
-    private int pausePosition = 0;
+    private List<ProductDTO> productList;
+    private boolean isCrawling = false;
+    private boolean isFinished = false;
     
     public HangchinhhieuCrawler() {
+    }
+
+    @Override
+    public void run() {
+        try {
+            if (this.isFinished) {
+                this.isFinished = false;
+            }
+            crawl();
+        } catch (SQLException | NamingException ex) {
+            Logger.getLogger(HangchinhhieuCrawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @Override
     public void crawl() throws SQLException, NamingException {
-        if (!this.isStop) {
+        if (this.isCrawling) {
             System.out.println("HANGCHINHHIEU - CRAWLING");
-            this.isStop = false;
 
+            this.productList = new LinkedList<>();
             // get Laptops, Mouses, Keyboards
             this.productList.addAll(getAllDraftProducts(siteUrl + laptopPath, ProductType.LAPTOP));
             this.productList.addAll(getAllDraftProducts(siteUrl + mousePath, ProductType.MOUSE));
             this.productList.addAll(getAllDraftProducts(siteUrl + keyboardPath, ProductType.KEYBOARD));
+            
 
             List<ProductDTO> existingProductList = productDAO.getAllProduct();
             List<String> existingHashCode = new LinkedList<>();
@@ -71,13 +84,12 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
                 existingHashCode.add(product.getHashCode());
             }
 
-            for (int i = pausePosition; i < productList.size(); i++) {
+            for (int i = 0; i < productList.size(); i++) {
                 try {
-                    if (isStop) {
+                    if (!this.isCrawling) {
                         System.out.println("HANGCHINHHIEU - PAUSED");
                         break;
                     } else {
-                        this.pausePosition++;
                         ProductDTO product = productList.get(i);
                         if (!existingHashCode.contains(product.getHashCode())) {
                             String tableDomString = getInfoTableDomString(product.getProductLink());
@@ -104,19 +116,30 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
                     System.out.println(e);
                 }
             }
-            if (!this.isStop) {
+            if (this.isCrawling) {
                 System.out.println("HANGCHINHHIEU - FINISHED");
+                this.isFinished = true;
+                this.isCrawling = false;
             }
-            this.isStop = true;
         }
     }
 
     @Override
     public void pause() {
-        if (!this.isStop) {
-            this.isStop = true;
+        if (this.isCrawling && !this.isFinished) {
+            this.isCrawling = false;
             System.out.println("HANGCHINHHIEU - PAUSED");
         }
+    }
+
+    @Override
+    public boolean isCrawling() {
+        return isCrawling;
+    }
+
+    @Override
+    public void setIsCrawling(boolean isCrawling) {
+        this.isCrawling = isCrawling;
     }
     
     private String getPaginationDomString(String url) {
@@ -206,35 +229,41 @@ public class HangchinhhieuCrawler implements CrawlerInterface {
     
     private List<ProductDTO> getAllDraftProducts(String url, ProductType productType) {
         List<ProductDTO> productArray = new LinkedList<>();
-        try {
-            int lastPageNumber = getLastPageNumber(url);
-            for (int page = 1; page <= lastPageNumber; page++) {
-                String domString = getProductListDomString(url + "?page=" + page);
-                if (!domString.isEmpty()) {
-                    Document document = XMLUtilities.parseStringToDom(domString);
-                    XPath xPath = XMLUtilities.getXPath();
-                    NodeList productList = (NodeList) xPath.evaluate("//*[@id=\"pd_collection\"]/ul/li", document, XPathConstants.NODESET);
-                    if (productList != null) {
-                        for (int p = 0; p < productList.getLength(); p++) {
-                            Node productNode = productList.item(p);
-                            
-                            Node productLinkNode = (Node) xPath.evaluate(".//a[@class=\"productName\"]", productNode, XPathConstants.NODE);
-                            String productLink = productLinkNode.getAttributes().getNamedItem("href").getTextContent().trim();
-                            String productName = productLinkNode.getAttributes().getNamedItem("title").getTextContent().trim();
-                            String productPrice = (String) xPath.evaluate(".//p[@class=\"pdPrice\"]/span", productNode, XPathConstants.STRING);
-                            Node productImageNode = (Node) xPath.evaluate(".//div[@class=\"image-product\"]/a/img", productNode, XPathConstants.NODE);
-                            String productImage = productImageNode.getAttributes().getNamedItem("src").getTextContent().trim();
-                            
-                            productLink = siteUrl + productLink;
-                            
-                            ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceHangchinhhieu(productPrice), productLink);
-                            productArray.add(product);
+        if (this.isCrawling) {
+            try {
+                int lastPageNumber = getLastPageNumber(url);
+                for (int page = 1; page <= lastPageNumber; page++) {
+                    if (!this.isCrawling) {
+                        break;
+                    }
+                    String domString = getProductListDomString(url + "?page=" + page);
+                    if (!domString.isEmpty()) {
+                        Document document = XMLUtilities.parseStringToDom(domString);
+                        XPath xPath = XMLUtilities.getXPath();
+                        NodeList productList = (NodeList) xPath.evaluate("//*[@id=\"pd_collection\"]/ul/li", document, XPathConstants.NODESET);
+                        if (productList != null) {
+                            for (int p = 0; p < productList.getLength(); p++) {
+                                Node productNode = productList.item(p);
+
+                                Node productLinkNode = (Node) xPath.evaluate(".//a[@class=\"productName\"]", productNode, XPathConstants.NODE);
+                                String productLink = productLinkNode.getAttributes().getNamedItem("href").getTextContent().trim();
+                                String productName = productLinkNode.getAttributes().getNamedItem("title").getTextContent().trim();
+                                String productPrice = (String) xPath.evaluate(".//p[@class=\"pdPrice\"]/span", productNode, XPathConstants.STRING);
+                                Node productImageNode = (Node) xPath.evaluate(".//div[@class=\"image-product\"]/a/img", productNode, XPathConstants.NODE);
+                                String productImage = productImageNode.getAttributes().getNamedItem("src").getTextContent().trim();
+
+                                productLink = siteUrl + productLink;
+
+                                ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceHangchinhhieu(productPrice), productLink);
+                                productArray.add(product);
+                                System.out.println("HANGCHINHHIEU - GET DRAFT: " + product.getProductLink());
+                            }
                         }
                     }
                 }
+            } catch (XPathExpressionException | DOMException ex) {
+                Logger.getLogger(HangchinhhieuCrawler.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (XPathExpressionException | DOMException ex) {
-            Logger.getLogger(HangchinhhieuCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         return productArray;
     }

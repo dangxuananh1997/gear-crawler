@@ -13,4 +13,8 @@ public interface CrawlerInterface {
     
     void pause();
     
+    boolean isCrawling();
+    
+    void setIsCrawling(boolean isCrawling);
+    
 }

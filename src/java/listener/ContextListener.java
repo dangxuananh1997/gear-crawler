@@ -19,10 +19,10 @@ public class ContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("CREATING CRAWLERS!");
-        HangchinhhieuCrawler hccCrawler = new HangchinhhieuCrawler();
         XgearCrawler xgearCrawler = new XgearCrawler();
-        crawlerList.add(hccCrawler);
+        HangchinhhieuCrawler hccCrawler = new HangchinhhieuCrawler();
         crawlerList.add(xgearCrawler);
+        crawlerList.add(hccCrawler);
         System.out.println("CRAWLERS CREATED!");
         sce.getServletContext().setAttribute("CRAWLERLIST", crawlerList);
     }

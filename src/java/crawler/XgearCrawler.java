@@ -35,7 +35,7 @@ import utility.XMLUtilities;
  *
  * @author dangxuananh1997
  */
-public class XgearCrawler implements CrawlerInterface {
+public class XgearCrawler implements CrawlerInterface, Runnable {
     
     private final String siteUrl = "https://xgear.vn";
     private final String[] laptopPath = {
@@ -52,19 +52,31 @@ public class XgearCrawler implements CrawlerInterface {
     MouseDAO mouseDAO = new MouseDAO();
     KeyboardDAO keyboardDAO = new KeyboardDAO();
             
-    private List<ProductDTO> productList = new LinkedList<>();
-    private boolean isStop = false;
-    private int pausePosition = 0;
+    private List<ProductDTO> productList;
+    private boolean isCrawling = false;
+    private boolean isFinished = false;
     
     public XgearCrawler() {
     }
 
     @Override
-    public void crawl() throws SQLException, NamingException {
-        if (!this.isStop) {
-            System.out.println("XGEAR - CRAWLING");
-            this.isStop = false;
+    public void run() {
+        try {
+            if (this.isFinished) {
+                this.isFinished = false;
+            }
+            crawl();
+        } catch (SQLException | NamingException ex) {
+            Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
+    @Override
+    public void crawl() throws SQLException, NamingException {
+        if (this.isCrawling) {
+            System.out.println("XGEAR - CRAWLING");
+
+            this.productList = new LinkedList<>();
             // get Laptops, Mouses, Keyboards
             for (String path : laptopPath) {
                 this.productList.addAll(getAllDraftProducts(siteUrl + path, ProductType.LAPTOP));
@@ -78,13 +90,12 @@ public class XgearCrawler implements CrawlerInterface {
                 existingHashCode.add(product.getHashCode());
             }
 
-            for (int i = pausePosition; i < productList.size(); i++) {
+            for (int i = 0; i < productList.size(); i++) {
                 try {
-                    if (isStop) {
-                        System.out.println("\nXGEAR - PAUSED");
+                    if (!this.isCrawling) {
+                        System.out.println("XGEAR - PAUSED");
                         break;
                     } else {
-                        this.pausePosition++;
                         ProductDTO product = productList.get(i);
                         if (!existingHashCode.contains(product.getHashCode())) {
                             String tableDomString = getInfoTableDomString(product.getProductLink());
@@ -107,23 +118,34 @@ public class XgearCrawler implements CrawlerInterface {
                             }      
                         }
                     }
-                } catch (Exception e) {
-                    System.out.println(e);
+                } catch (SQLException | NamingException ex) {
+                    Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            if (!this.isStop) {
+            if (this.isCrawling) {
                 System.out.println("XGEAR - FINISHED");
+                this.isFinished = true;
+                this.isCrawling = false;
             }
-            this.isStop = true;
         }
     }
-    
+
     @Override
     public void pause() {
-        if (!this.isStop) {
-            this.isStop = true;
+        if (this.isCrawling && !isFinished) {
+            this.isCrawling = false;
             System.out.println("HANGCHINHHIEU - PAUSED");
         }
+    }
+
+    @Override
+    public boolean isCrawling() {
+        return isCrawling;
+    }
+
+    @Override
+    public void setIsCrawling(boolean isCrawling) {
+        this.isCrawling = isCrawling;
     }
     
     private String getPaginationDomString(String url) {
@@ -216,37 +238,43 @@ public class XgearCrawler implements CrawlerInterface {
     
     private List<ProductDTO> getAllDraftProducts(String url, ProductType productType) {
         List<ProductDTO> productArray = new LinkedList<>();
-        try {
-            int lastPageNumber = getLastPageNumber(url);
-            for (int page = 1; page <= lastPageNumber; page++) {
-                String domString = getProductListDomString(url + "/page/" + page);
-                if (!domString.isEmpty()) {
-                    Document document = XMLUtilities.parseStringToDom(domString);
-                    XPath xPath = XMLUtilities.getXPath();
-                    NodeList productList = (NodeList) xPath.evaluate("./ul/li", document, XPathConstants.NODESET);
-                    if (productList != null) {
-                        for (int p = 0; p < productList.getLength(); p++) {
-                            Node productNode = productList.item(p);
-                            
-                            Node productImageNode = (Node) xPath.evaluate(".//img", productNode, XPathConstants.NODE);
-                            String productImage = productImageNode.getAttributes().getNamedItem("src").getTextContent().trim();
-                            
-                            Node productLinkNode = (Node) xPath.evaluate(".//div[@class='item-img products-thumb']/a", productNode, XPathConstants.NODE);
-                            String productLink = productLinkNode.getAttributes().getNamedItem("href").getTextContent().trim();
-                            
-                            Node productNameNode = (Node) xPath.evaluate(".//div[@class='item-content products-content']/h4/a", productNode, XPathConstants.NODE);
-                            String productName = productNameNode.getTextContent();
-                            
-                            String productPrice = (String) xPath.evaluate(".//span[@class='item-price']/span", productNode, XPathConstants.STRING);
-                            
-                            ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceXgear(productPrice), productLink);
-                            productArray.add(product);
+        if (this.isCrawling) {
+            try {
+                int lastPageNumber = getLastPageNumber(url);
+                for (int page = 1; page <= lastPageNumber; page++) {
+                    if (!this.isCrawling) {
+                        break;
+                    }
+                    String domString = getProductListDomString(url + "/page/" + page);
+                    if (!domString.isEmpty()) {
+                        Document document = XMLUtilities.parseStringToDom(domString);
+                        XPath xPath = XMLUtilities.getXPath();
+                        NodeList productList = (NodeList) xPath.evaluate("./ul/li", document, XPathConstants.NODESET);
+                        if (productList != null) {
+                            for (int p = 0; p < productList.getLength(); p++) {
+                                Node productNode = productList.item(p);
+
+                                Node productImageNode = (Node) xPath.evaluate(".//img", productNode, XPathConstants.NODE);
+                                String productImage = productImageNode.getAttributes().getNamedItem("src").getTextContent().trim();
+
+                                Node productLinkNode = (Node) xPath.evaluate(".//div[@class='item-img products-thumb']/a", productNode, XPathConstants.NODE);
+                                String productLink = productLinkNode.getAttributes().getNamedItem("href").getTextContent().trim();
+
+                                Node productNameNode = (Node) xPath.evaluate(".//div[@class='item-content products-content']/h4/a", productNode, XPathConstants.NODE);
+                                String productName = productNameNode.getTextContent();
+
+                                String productPrice = (String) xPath.evaluate(".//span[@class='item-price']/span", productNode, XPathConstants.STRING);
+
+                                ProductDTO product = new ProductDTO(productType, productName, productImage, CommonUtilities.convertPriceXgear(productPrice), productLink);
+                                productArray.add(product);
+                                System.out.println("XGEAR - GET DRAFT: " + product.getProductLink());
+                            }
                         }
                     }
                 }
+            } catch (XPathExpressionException | DOMException ex) {
+                Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (XPathExpressionException | DOMException ex) {
-            Logger.getLogger(XgearCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         return productArray;
     }

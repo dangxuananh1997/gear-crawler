@@ -27,12 +27,18 @@ public class CrawlProductAction {
         switch (action) {
             case "Crawl":
                 for (CrawlerInterface crawler : crawlerList) {
-                    crawler.crawl();
+                    if (!crawler.isCrawling()) {
+                        crawler.setIsCrawling(true);
+                        Thread thread = new Thread((Runnable) crawler);
+                        thread.start();
+                    }
                 }
                 break;
             case "Pause":
                 for (CrawlerInterface crawler : crawlerList) {
-                    crawler.pause();
+                    if (crawler.isCrawling()) {
+                        crawler.pause();
+                    }
                 }
                 break;
             default:

@@ -33,7 +33,11 @@ public class HomeAction {
         ProductDAO productDAO = new ProductDAO();
         List<ProductDTO> productList = productDAO.getAllProduct(productType);
         this.lastPage = (int) Math.ceil((float) productList.size() / (float) this.pageSize);
-        productList = productList.subList(this.pageSize * (this.pageNumber - 1), this.pageSize * this.pageNumber);
+        if (productList.size() > this.pageSize * this.pageNumber) {
+            productList = productList.subList(this.pageSize * (this.pageNumber - 1), this.pageSize * this.pageNumber);
+        } else {
+            productList = productList.subList(this.pageSize * (this.pageNumber - 1), productList.size());
+        }
         
         try {
             Products products = new Products(productList);
