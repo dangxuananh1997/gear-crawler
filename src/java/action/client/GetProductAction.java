@@ -52,9 +52,6 @@ public class GetProductAction {
                 }
             }
             int lastPage = (int) Math.ceil((float) productList.size() / (float) this.pageSize);
-            System.out.println(lastPage);
-            System.out.println(productList.size());
-            System.out.println(this.pageSize);
             if (productList.size() > this.pageSize * this.pageNumber) {
                 productList = productList.subList(this.pageSize * (this.pageNumber - 1), this.pageSize * this.pageNumber);
             } else {

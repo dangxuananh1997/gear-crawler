@@ -13,7 +13,7 @@
   <xsl:template match="/">
     <xsl:apply-templates/>
   </xsl:template>
-  <xsl:template match="mouse">
+  <xsl:template match="laptop">
     <table>
       <tr>
         <th>CPU</th>

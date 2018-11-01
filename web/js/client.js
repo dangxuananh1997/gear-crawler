@@ -15,7 +15,6 @@ function getXSL() {
 }
 
 function showLoading(isLoading) {
-  console.log(isLoading);
   if (isLoading) {
   }
 }
@@ -56,9 +55,9 @@ function transformXML(xml) {
     getXSL();
   }
   if (document.implementation && document.implementation.createDocument) {
-    xsltProcessor = new XSLTProcessor();
+    let xsltProcessor = new XSLTProcessor();
     xsltProcessor.importStylesheet(productXSL);
-    resultDocument = xsltProcessor.transformToFragment(xml, document);
+    let resultDocument = xsltProcessor.transformToFragment(xml, document);
     return resultDocument;
   }
 }
@@ -76,7 +75,7 @@ function changePage(event) {
   const pageNumber = event.srcElement.dataset.page;
   getData(pageNumber);
   let selectedPage = document.querySelector('section.pagination nav a.selected');
-  if (!selectedPage) {
+  if (selectedPage) {
     selectedPage.classList.remove('selected');
   }
   event.srcElement.classList.add('selected');

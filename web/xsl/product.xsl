@@ -17,7 +17,7 @@
     <xsl:for-each select="product">
       <xsl:element name="a">
         <xsl:attribute name="href">
-          <xsl:text>/GearCrawler/viewDetails?productId=<xsl:value-of select="id"/></xsl:text>
+          <xsl:value-of select="concat('/GearCrawler/viewDetails?productId=', id)"/>
         </xsl:attribute>
         <article class="product">
           <div class="image-wrapper">
