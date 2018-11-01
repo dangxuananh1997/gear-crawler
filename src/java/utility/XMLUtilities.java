@@ -5,11 +5,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
+import jaxb.Data;
+import jaxb.Products;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -84,6 +90,15 @@ public class XMLUtilities {
             Logger.getLogger(XMLUtilities.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+    
+    public static String marshalling(Object o) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(o.getClass());
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(o, sw);
+        return sw.toString();
     }
     
 }

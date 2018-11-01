@@ -4,12 +4,11 @@ import com.opensymphony.xwork2.Action;
 import dao.ProductDAO;
 import dto.ProductDTO;
 import dto.ProductType;
-import java.io.StringWriter;
 import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+import javax.xml.bind.JAXBException;
 import jaxb.Data;
 import jaxb.Products;
+import utility.XMLUtilities;
 
 /**
  *
@@ -37,16 +36,10 @@ public class HomeAction {
         productList = productList.subList(this.pageSize * (this.pageNumber - 1), this.pageSize * this.pageNumber);
         
         try {
-            JAXBContext context = JAXBContext.newInstance(Data.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-            StringWriter sw = new StringWriter();
-            Products products = new Products();
-            products.setProduct(productList);
+            Products products = new Products(productList);
             Data data = new Data(lastPage, pageNumber, products);
-            marshaller.marshal(data, sw);
-            this.xmlOutput = sw.toString();
-        } catch (Exception e) {
+            this.xmlOutput = XMLUtilities.marshalling(data);
+        } catch (JAXBException e) {
             System.out.println(e);
             return Action.ERROR;
         }

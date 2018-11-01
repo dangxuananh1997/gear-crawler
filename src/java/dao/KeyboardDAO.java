@@ -1,6 +1,8 @@
 package dao;
 
 import dto.KeyboardDTO;
+import dto.MouseDTO;
+import dto.ProductDTO;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,6 +48,46 @@ public class KeyboardDAO implements Serializable {
                 con.close();
             }
         }
+    }
+    
+    public KeyboardDTO getKeyboardByProduct(ProductDTO product) throws NamingException, SQLException {
+        Connection con = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        KeyboardDTO keyboard = null;
+        
+        try {
+            con = DBUtilities.makeConnection();
+            if (con != null) {
+                String sql = "SELECT * FROM Keyboard WHERE ProductId = ?";
+                stm = con.prepareStatement(sql);
+                stm.setInt(1, product.getId());
+                rs = stm.executeQuery();
+                
+                while (rs.next()) {
+                    int Id =  rs.getInt("Id");
+                    String numberOfKeys = rs.getString("NumberOfKeys");
+                    String pressForce = rs.getString("PressForce");
+                    String distance = rs.getString("Distance");
+                    String led = rs.getString("LED");
+                    String weight = rs.getString("Weight");
+                    String size = rs.getString("Size");
+                    String switches = rs.getString("Switches");
+                    keyboard = new KeyboardDTO(Id, numberOfKeys, pressForce, distance, led, weight, size, switches, product);
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return keyboard;
     }
     
 }

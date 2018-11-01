@@ -42,6 +42,10 @@ header span {
   width: auto;
   margin-left: 10px;
 }
+header span a {
+  text-decoration: none;
+  color: #00b4f0;
+}
 header nav {
   margin-right: 10px;
 }
@@ -177,4 +181,51 @@ section.pagination nav a:hover, section.pagination a.selected {
   background: #00b4f0;
   color: #000000;
   font-weight: bold;
+}
+
+/* details */
+section.product-details {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  color: #ffffff;
+}
+section.product-details div.image-wrapper {
+  margin-right: 20px;
+  position: relative;
+  overflow: hidden;
+  width: 500px;
+  height: 500px;
+  border-radius: 4px;
+}
+section.product-details div.image-wrapper img {
+  position: absolute;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+section.product-details div.details-info h1 {
+  margin-top: 0;
+  font-weight: 700;
+}
+section.product-details div.details-info {
+  width: calc(100% - 520px);
+}
+section.product-details div.details-info table {
+  border: 1px solid #ffffff;
+  border-collapse: collapse;
+  max-width: 100%;
+}
+section.product-details div.details-info table th{
+  border: 1px solid #ffffff;
+  padding: 10px;
+}
+section.product-details div.details-info table td {
+  border: 1px solid #ffffff;
+  padding: 10px;
+}
+section.product-details div.details-info table td a {
+  color: #3ecfff;
 }

@@ -6,13 +6,15 @@ import dto.ProductDTO;
 import dto.ProductType;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+import javax.naming.NamingException;
+import javax.xml.bind.JAXBException;
 import jaxb.Data;
 import jaxb.Products;
+import utility.XMLUtilities;
 
 /**
  *
@@ -59,16 +61,11 @@ public class GetProductAction {
                 productList = productList.subList(this.pageSize * (this.pageNumber - 1), productList.size());
             }
             
-            JAXBContext context = JAXBContext.newInstance(Data.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-            StringWriter sw = new StringWriter();
-            Products products = new Products();
-            products.setProduct(productList);
+            Products products = new Products(productList);
             Data data = new Data(lastPage, pageNumber, products);
-            marshaller.marshal(data, sw);
-            this.result = new ByteArrayInputStream(sw.toString().getBytes("UTF-8"));
-        } catch (Exception e) {
+            String xml = XMLUtilities.marshalling(data);
+            this.result = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException | SQLException | NamingException | JAXBException e) {
             System.out.println(e);
             return Action.ERROR;
         }

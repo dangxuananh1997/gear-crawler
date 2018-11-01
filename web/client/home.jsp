@@ -3,6 +3,7 @@
     Created on : Oct 31, 2018, 12:16:09 AM
     Author     : dangxuananh1997
 --%>
+
 <%@taglib uri="/struts-tags" prefix="s"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/xml" prefix="x"%>
@@ -27,7 +28,9 @@
   </head>
   <body>
     <header>
-      <span>Gear Crawler</span>
+      <span>
+        <a href="/GearCrawler">Gear Crawler</a>
+      </span>
       <nav>
         <a <s:if test="%{productType.getValue() == 1}">class="selected"</s:if> href="/GearCrawler/laptop">Laptop</a>
         <a <s:if test="%{productType.getValue() == 2}">class="selected"</s:if> href="/GearCrawler/mouse">Mouse</a>
@@ -53,7 +56,5 @@
         <nav></nav>
       </section>
     </main>
-
-    <footer></footer>
   </body>
 </html>

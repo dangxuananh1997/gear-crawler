@@ -1,6 +1,8 @@
 package dao;
 
+import dto.LaptopDTO;
 import dto.MouseDTO;
+import dto.ProductDTO;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,6 +45,43 @@ public class MouseDAO implements Serializable {
                 con.close();
             }
         }
+    }
+    
+    public MouseDTO getMouseByProduct(ProductDTO product) throws NamingException, SQLException {
+        Connection con = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        MouseDTO mouse = null;
+        
+        try {
+            con = DBUtilities.makeConnection();
+            if (con != null) {
+                String sql = "SELECT * FROM Mouse WHERE ProductId = ?";
+                stm = con.prepareStatement(sql);
+                stm.setInt(1, product.getId());
+                rs = stm.executeQuery();
+                
+                while (rs.next()) {
+                    int Id =  rs.getInt("Id");
+                    String weight = rs.getString("Weight");
+                    String maxDPI = rs.getString("MaxDPI");
+                    String led = rs.getString("LED");
+                    String numberOfButton = rs.getString("NumberOfButton");
+                    mouse = new MouseDTO(Id, weight, maxDPI, led, numberOfButton, product);
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stm != null) {
+                stm.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return mouse;
     }
     
 }

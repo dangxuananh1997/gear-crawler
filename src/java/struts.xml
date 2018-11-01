@@ -36,5 +36,9 @@
       <result name="success">client/home.jsp</result>
       <result name="error">error.html</result>
     </action>
+    <action name="viewDetails" class="action.client.ViewDetailsAction">
+      <result name="success">client/viewDetails.jsp</result>
+      <result name="error">error.html</result>
+    </action>
   </package>
 </struts>

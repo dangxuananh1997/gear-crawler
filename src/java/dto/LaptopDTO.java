@@ -1,20 +1,49 @@
 package dto;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  *
  * @author dangxuananh1997
  */
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = { "id", "cpu", "gpu", "ram", "hardDrive", "monitor", "ports", "lan", "wireless", "product" })
+@XmlRootElement(name = "laptop")
 public class LaptopDTO {
     
+    @XmlElement(required = true)
     private int id;
+    
+    @XmlElement(required = true)
     private String cpu;
+    
+    @XmlElement(required = true)
     private String gpu;
+    
+    @XmlElement(required = true)
     private String ram;
+    
+    @XmlElement(required = true)
     private String hardDrive;
+    
+    @XmlElement(required = true)
     private String monitor;
+    
+    @XmlElement(required = true)
     private String ports;
+    
+    @XmlElement(required = true)
     private String lan;
+    
+    @XmlElement(required = true)
     private String wireless;
+    
+    @XmlElement(required = true)
     private ProductDTO product;
 
     public LaptopDTO(String cpu, String gpu, String ram, String hardDrive, String monitor, String ports, String lan, String wireless, ProductDTO product) {
@@ -40,6 +69,9 @@ public class LaptopDTO {
         this.lan = lan;
         this.wireless = wireless;
         this.product = product;
+    }
+
+    public LaptopDTO() {
     }
 
     public int getId() {

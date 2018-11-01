@@ -20,6 +20,10 @@ public class Products {
     @XmlElement(required = true, name = "product")
     private List<ProductDTO> product;
 
+    public Products(List<ProductDTO> product) {
+        this.product = product;
+    }
+
     public List<ProductDTO> getProduct() {
         if (product == null) {
             product = new LinkedList<>();
