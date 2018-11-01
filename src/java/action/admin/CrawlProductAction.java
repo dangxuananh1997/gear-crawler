@@ -15,15 +15,12 @@ public class CrawlProductAction {
     // Inputs
     private String action;
     
-    // Local Variables
-    private List<CrawlerInterface> crawlerList;
-    
     public CrawlProductAction() {
     }
     
     public String execute() throws Exception {
         ServletContext context = ServletActionContext.getServletContext();
-        crawlerList = (List<CrawlerInterface>) context.getAttribute("CRAWLERLIST");
+        List<CrawlerInterface> crawlerList = (List<CrawlerInterface>) context.getAttribute("CRAWLERLIST");
         switch (action) {
             case "Crawl":
                 for (CrawlerInterface crawler : crawlerList) {
