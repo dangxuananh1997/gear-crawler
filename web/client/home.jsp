@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="assets/fonts/material-icons/material-icons.css">
     <script>
       let productType = <s:property value="%{productType.getValue()}"/>;
+      let lastPage = <s:property value="%{lastPage}"/>;
     </script>
     <script src="js/client.js"></script>
   </head>
@@ -45,16 +46,7 @@
       </section>
 
       <section class="pagination">
-        <nav>
-          <s:set var="lastPage" value="%{lastPage}" />
-          <s:iterator begin="1" end="lastPage" status="i">
-            <a data-page="<s:property value="%{#i.index + 1}"/>"
-              class="<s:if test="%{0 == #i.index}">selected</s:if>"
-              onclick="changePage(event)">
-              <s:property value="%{#i.index + 1}"/>
-            </a>
-          </s:iterator>
-        </nav>
+        <nav></nav>
       </section>
     </main>
 

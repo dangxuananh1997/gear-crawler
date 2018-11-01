@@ -1,7 +1,11 @@
 let productXSL;
-let lastPage;
+let timeoutSearch;
 
-getXSL();
+// document ready
+document.addEventListener("DOMContentLoaded", function() { 
+  updatePagination(lastPage);
+  getXSL();
+});
 
 function getXSL() {
   let xhttp = new XMLHttpRequest();
@@ -26,6 +30,7 @@ function getData(pageNumber) {
   xhttp.onreadystatechange = function() {
     if (this.readyState === 4 && this.status === 200) {
       let resLastPage = this.responseXML.querySelector('lastPage').innerHTML;
+      resLastPage = parseInt(resLastPage);
       if (lastPage !== resLastPage) {
         lastPage = resLastPage;
         updatePagination(lastPage);
@@ -54,8 +59,6 @@ function transformXML(xml) {
   }
 }
 
-let timeoutSearch;
-
 function search() {
   if (timeoutSearch) {
     clearTimeout(timeoutSearch);
@@ -73,13 +76,12 @@ function changePage(event) {
 }
 
 function updatePagination(lastPage) {
-  console.log(lastPage);
-  const pageLinkList = document.querySelector('section.pagination nav');
-  let newPages = '';
+  const paginationDiv = document.querySelector('section.pagination nav');
+  let pages = '';
   let i;
   for (i = 1; i <= lastPage; i++) {
-    newPages += '<a data-page="' + i + '" onclick="changePage(event)">' + i + '</a>';
+    pages += '<a data-page="' + i + '" onclick="changePage(event)">' + i + '</a>';
   }
-  pageLinkList.innerHTML = newPages;
+  paginationDiv.innerHTML = pages;
   document.querySelector('section.pagination nav a:first-child').classList.add('selected');
 }
