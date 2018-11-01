@@ -1,11 +1,7 @@
+let productType;
+let lastPage;
 let productXSL;
 let timeoutSearch;
-
-// document ready
-document.addEventListener("DOMContentLoaded", function() { 
-  updatePagination(lastPage);
-  getXSL();
-});
 
 function getXSL() {
   let xhttp = new XMLHttpRequest();
@@ -14,7 +10,7 @@ function getXSL() {
       productXSL = this.responseXML;
     }
   };
-  xhttp.open('GET', '/GearCrawler/product.xsl', true);
+  xhttp.open('GET', '/GearCrawler/xsl/product.xsl', true);
   xhttp.send();
 }
 
@@ -31,14 +27,22 @@ function getData(pageNumber) {
     if (this.readyState === 4 && this.status === 200) {
       let resLastPage = this.responseXML.querySelector('lastPage').innerHTML;
       resLastPage = parseInt(resLastPage);
-      if (lastPage !== resLastPage) {
-        lastPage = resLastPage;
-        updatePagination(lastPage);
+      
+      let productListWrapper = document.getElementById('productList');
+      // products not empty
+      if (resLastPage !== 0) {
+        if (lastPage !== resLastPage) {
+          lastPage = resLastPage;
+          updatePagination(lastPage);
+        }
+        showLoading(false);
+        const result = transformXML(this.responseXML);
+        productListWrapper.innerHTML = '';
+        productListWrapper.append(result);
+      } else {
+        productListWrapper.innerHTML = '<h1 class="no-result">No Result!</h1>';
+        updatePagination(0);
       }
-      showLoading(false);
-      const result = transformXML(this.responseXML);
-      document.getElementById('productList').innerHTML = '';
-      document.getElementById('productList').append(result);
     }
   };
   
@@ -71,7 +75,10 @@ function search() {
 function changePage(event) {
   const pageNumber = event.srcElement.dataset.page;
   getData(pageNumber);
-  document.querySelector('section.pagination nav a.selected').classList.remove('selected');
+  let selectedPage = document.querySelector('section.pagination nav a.selected');
+  if (!selectedPage) {
+    selectedPage.classList.remove('selected');
+  }
   event.srcElement.classList.add('selected');
 }
 
@@ -83,5 +90,8 @@ function updatePagination(lastPage) {
     pages += '<a data-page="' + i + '" onclick="changePage(event)">' + i + '</a>';
   }
   paginationDiv.innerHTML = pages;
-  document.querySelector('section.pagination nav a:first-child').classList.add('selected');
+  let firstPage = document.querySelector('section.pagination nav a:first-child');
+  if (firstPage) {
+    firstPage.classList.add('selected');
+  }
 }

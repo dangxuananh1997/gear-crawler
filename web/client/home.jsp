@@ -14,11 +14,16 @@
     <title>Gear Crawler - ${productType}</title>
     <link rel="stylesheet" href="css/client.css">
     <link rel="stylesheet" href="assets/fonts/material-icons/material-icons.css">
-    <script>
-      let productType = <s:property value="%{productType.getValue()}"/>;
-      let lastPage = <s:property value="%{lastPage}"/>;
-    </script>
     <script src="js/client.js"></script>
+    <script>
+      // document ready
+      document.addEventListener("DOMContentLoaded", function() { 
+        productType = <s:property value="%{productType.getValue()}"/>;
+        lastPage = <s:property value="%{lastPage}"/>;
+        updatePagination(lastPage);
+        getXSL();
+      });
+    </script>
   </head>
   <body>
     <header>
@@ -35,12 +40,11 @@
         <div>
           <i class="material-icons">search</i>
           <input type="text" name="search" id="search" onkeyup="search()">
-          <button onclick="getData()">Search</button>
         </div>
       </section>
       
       <section class="product-list" id="productList">
-        <c:import url="../product.xsl" var="xslProduct" />
+        <c:import url="../xsl/product.xsl" var="xslProduct" />
         <s:set var="xml" value="%{xmlOutput}" />
         <x:transform xml="${xml}" xslt="${xslProduct}" />
       </section>
